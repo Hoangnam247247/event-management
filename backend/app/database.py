@@ -1,39 +1,9 @@
-# backend/app/database.py
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-import os
-from dotenv import load_dotenv
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-# Load biến môi trường từ file .env
-load_dotenv()
+SQLALCHEMY_DATABASE_URL = "postgresql://username:password@localhost:5432/event_management"
 
-# Lấy DATABASE_URL từ .env
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL không được tìm thấy trong .env")
-
-# Tạo engine SQLAlchemy
-engine = create_engine(
-    DATABASE_URL,
-    echo=True,      # Log các câu lệnh SQL, tiện debug
-    future=True
-)
-
-# Tạo session factory
-SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    autocommit=False
-)
-
-# Base class để định nghĩa model
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
-# Dependency cho FastAPI
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
