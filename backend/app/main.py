@@ -1,17 +1,14 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.routers import event_router
+from app.database import Base, engine
+from app.routers import events, registrations
+from app.models.ticket import Ticket
+from app.routers import tickets
 
-app = FastAPI(title="Event Management API")
+Base.metadata.create_all(bind=engine)
 
-# Bật CORS cho frontend React
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # địa chỉ frontend
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(title="Event Management Platform")
 
-# Include router sự kiện
-app.include_router(event_router.router)
+app.include_router(events.router)
+app.include_router(registrations.router)
+app.include_router(tickets.router)
+

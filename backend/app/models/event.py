@@ -1,16 +1,15 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class Event(Base):
     __tablename__ = "events"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
-    location = Column(String(255))
-    image_url = Column(Text)
-    capacity = Column(Integer)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    location = Column(String)
+
+    detail = relationship("EventDetail", back_populates="event", uselist=False)
+    registrations = relationship("Registration", back_populates="event")
