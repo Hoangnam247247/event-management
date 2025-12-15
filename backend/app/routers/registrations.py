@@ -20,22 +20,32 @@ def get_db():
 
 @router.post("/{event_id}")
 def register(event_id: int, data: RegistrationCreate, db: Session = Depends(get_db)):
-    # 0. Lấy thông tin event
+    # 0. Kiểm tra event tồn tại
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event:
         return {"error": "Event not found"}
 
-    # 1. Lưu registration (RSVP)
+    # 1. Kiểm tra ghế đã được đặt chưa
+    seat_exists = db.query(Registration).filter(
+        Registration.event_id == event_id,
+        Registration.seat_number == data.seat_number
+    ).first()
+
+    if seat_exists:
+        return {"error": "Seat already booked"}
+
+    # 2. Lưu registration (RSVP + seat)
     reg = Registration(
         name=data.name,
         email=data.email,
-        event_id=event_id
+        event_id=event_id,
+        seat_number=data.seat_number
     )
     db.add(reg)
     db.commit()
     db.refresh(reg)
 
-    # 2. Tạo ticket
+    # 3. Tạo ticket
     ticket = Ticket(
         registration_id=reg.id,
         qr_code=str(uuid.uuid4())
@@ -43,16 +53,17 @@ def register(event_id: int, data: RegistrationCreate, db: Session = Depends(get_
     db.add(ticket)
     db.commit()
 
-    # 3. GỬI EMAIL NGAY LẬP TỨC (ĐÚNG CHỖ)
+    # 4. Gửi email xác nhận ngay
     send_registration_email(
         to_email=reg.email,
         event_title=event.title,
         qr_code=ticket.qr_code
     )
 
-    # 4. Trả kết quả
+    # 5. Trả kết quả
     return {
         "message": "Registered successfully",
         "registration_id": reg.id,
+        "seat": reg.seat_number,
         "qr_code": ticket.qr_code
     }
