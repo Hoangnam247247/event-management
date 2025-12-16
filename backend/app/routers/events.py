@@ -5,6 +5,7 @@ from app.models.event import Event
 from app.models.event_detail import EventDetail
 from app.models.registration import Registration
 from app.schemas.event import EventCreate
+from sqlalchemy.orm import joinedload
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -47,7 +48,7 @@ def create_event(data: EventCreate, db: Session = Depends(get_db)):
 # ===============================
 @router.get("/")
 def get_events(db: Session = Depends(get_db)):
-    return db.query(Event).all()
+    return db.query(Event).options(joinedload(Event.detail)).all()
 
 # ===============================
 # GET BOOKED SEATS FOR EVENT

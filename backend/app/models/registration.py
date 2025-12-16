@@ -8,6 +8,7 @@ class Registration(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     email = Column(String)
+    seat_number = Column(String)
     status = Column(String, default="registered")
     event_id = Column(Integer, ForeignKey("events.id"))
 
