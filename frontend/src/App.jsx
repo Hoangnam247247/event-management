@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Events from "./pages/Events";
 import JoinedEvents from "./pages/JoinedEvents";
 import EventDetail from "./pages/EventDetail";
-
+import CheckIn from "./pages/CheckIn";
 
 function App() {
   return (
@@ -12,10 +12,11 @@ function App() {
       <Sidebar />
       <div style={{ flex: 1, padding: 20 }}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/events" element={<Events />} />
           <Route path="/joined" element={<JoinedEvents />} />
           <Route path="/events/:id" element={<EventDetail />} />
+          <Route path="/check-in" element={<CheckIn />} />
         </Routes>
       </div>
     </div>

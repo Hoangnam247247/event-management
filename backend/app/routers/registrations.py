@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from sqlalchemy.orm import Session, joinedload
 import uuid
 
 from app.database import SessionLocal
@@ -8,6 +8,7 @@ from app.models.ticket import Ticket
 from app.models.event import Event
 from app.schemas.registration import RegistrationCreate
 from app.utils.email import send_registration_email
+from app.utils.qr import generate_qr_image
 
 router = APIRouter(prefix="/registrations", tags=["Registrations"])
 
@@ -19,22 +20,26 @@ def get_db():
         db.close()
 
 @router.post("/{event_id}")
-def register(event_id: int, data: RegistrationCreate, db: Session = Depends(get_db)):
+def register(
+    event_id: int,
+    data: RegistrationCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     # 0. Kiểm tra event tồn tại
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event:
-        return {"error": "Event not found"}
+        raise HTTPException(status_code=404, detail="Event not found")
 
-    # 1. Kiểm tra ghế đã được đặt chưa
+    # 1. Kiểm tra ghế
     seat_exists = db.query(Registration).filter(
         Registration.event_id == event_id,
         Registration.seat_number == data.seat_number
     ).first()
-
     if seat_exists:
-        return {"error": "Seat already booked"}
+        raise HTTPException(status_code=400, detail="Seat already booked")
 
-    # 2. Lưu registration (RSVP + seat)
+    # 2. Lưu registration
     reg = Registration(
         name=data.name,
         email=data.email,
@@ -52,18 +57,48 @@ def register(event_id: int, data: RegistrationCreate, db: Session = Depends(get_
     )
     db.add(ticket)
     db.commit()
+    db.refresh(ticket)
 
-    # 4. Gửi email xác nhận ngay
-    send_registration_email(
+    # 4. Tạo ảnh QR  ✅ ĐÚNG VỊ TRÍ
+    qr_path = generate_qr_image(ticket.qr_code)
+
+    # 5. Gửi email (chạy nền)
+    background_tasks.add_task(
+        send_registration_email,
         to_email=reg.email,
         event_title=event.title,
-        qr_code=ticket.qr_code
+        qr_code=ticket.qr_code,
+        qr_path=qr_path
     )
 
-    # 5. Trả kết quả
     return {
         "message": "Registered successfully",
         "registration_id": reg.id,
         "seat": reg.seat_number,
         "qr_code": ticket.qr_code
     }
+
+@router.get("/by-email")
+def get_registrations_by_email(
+    email: str,
+    db: Session = Depends(get_db)
+):
+    regs = (
+        db.query(Registration)
+        .options(joinedload(Registration.event))
+        .filter(Registration.email == email)
+        .all()
+    )
+
+    return [
+        {
+            "event_id": r.event.id,
+            "title": r.event.title,
+            "location": r.event.location,
+            "start_time": r.event.start_time,
+            "end_time": r.event.end_time,
+            "seat_number": r.seat_number,
+            "status": r.status
+        }
+        for r in regs
+    ]

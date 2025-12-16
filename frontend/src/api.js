@@ -13,3 +13,13 @@ export async function apiPost(url, data) {
   });
   return res.json();
 }
+
+// ----------------------
+// Thêm apiDelete
+// ----------------------
+export async function apiDelete(url) {
+  const res = await fetch(API_BASE + url, {
+    method: "DELETE"
+  });
+  return res.json();
+}

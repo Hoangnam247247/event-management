@@ -11,7 +11,7 @@ export default function Sidebar() {
       <h2>Event Admin</h2>
 
       <nav style={{ marginTop: 30 }}>
-        <p><Link to="/" style={link}>Dashboard</Link></p>
+        <p><Link to="/admin/dashboard" style={link}>Dashboard</Link></p>
         <p><Link to="/events" style={link}>Events</Link></p>
         <p><Link to="/joined" style={link}>Sự kiện đã tham gia</Link></p>
       </nav>
