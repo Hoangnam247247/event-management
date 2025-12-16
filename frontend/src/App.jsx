@@ -1,10 +1,23 @@
-import EventList from "./components/EventList";
+import { Routes, Route } from "react-router-dom";
+import Sidebar from "./layout/Sidebar";
+import Dashboard from "./pages/Dashboard";
+import Events from "./pages/Events";
+import JoinedEvents from "./pages/JoinedEvents";
+import EventDetail from "./pages/EventDetail";
+
 
 function App() {
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Event Management</h1>
-      <EventList />
+    <div style={{ display: "flex", height: "100vh" }}>
+      <Sidebar />
+      <div style={{ flex: 1, padding: 20 }}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/joined" element={<JoinedEvents />} />
+          <Route path="/events/:id" element={<EventDetail />} />
+        </Routes>
+      </div>
     </div>
   );
 }
