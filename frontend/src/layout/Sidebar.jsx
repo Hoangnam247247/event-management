@@ -14,6 +14,7 @@ export default function Sidebar() {
         <p><Link to="/admin/dashboard" style={link}>Dashboard</Link></p>
         <p><Link to="/events" style={link}>Events</Link></p>
         <p><Link to="/joined" style={link}>Sự kiện đã tham gia</Link></p>
+        <a href="/admin/checkin">Check-in</a>
       </nav>
     </div>
   );

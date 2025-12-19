@@ -19,29 +19,27 @@ def get_db():
 @router.post("/send")
 def send_event_reminders(db: Session = Depends(get_db)):
     now = datetime.now()
-    next_24h = now + timedelta(hours=24)
-
     events = db.query(Event).filter(
-        Event.start_time >= now,
-        Event.start_time <= next_24h
+        Event.start_time > now,
+        Event.start_time <= now + timedelta(hours=24)
     ).all()
 
     sent = 0
-
     for event in events:
         registrations = db.query(Registration).filter(
-            Registration.event_id == event.id
+            Registration.event_id == event.id,
+            Registration.reminder_sent == False
         ).all()
 
         for reg in registrations:
             send_reminder_email(
                 to_email=reg.email,
                 event_title=event.title,
-                start_time=str(event.start_time)
+                start_time=event.start_time.strftime("%d/%m/%Y %H:%M")
             )
+            reg.reminder_sent = True
             sent += 1
 
-    return {
-        "message": "Reminder emails sent",
-        "emails_sent": sent
-    }
+    db.commit()
+    return {"message": "Reminder emails sent", "emails_sent": sent}
+

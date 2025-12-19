@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -13,3 +13,6 @@ class Registration(Base):
     event_id = Column(Integer, ForeignKey("events.id"))
 
     event = relationship("Event", back_populates="registrations")
+    ticket = relationship("Ticket", back_populates="registration", uselist=False)
+    reminder_sent = Column(Boolean, default=False)
+

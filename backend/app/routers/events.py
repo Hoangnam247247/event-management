@@ -8,6 +8,7 @@ from app.models.event import Event
 from app.models.event_detail import EventDetail
 from app.models.registration import Registration
 from app.schemas.event import EventCreate
+from app.schemas.event import EventUpdate
 
 router = APIRouter(prefix="/events", tags=["Events"])
 
@@ -24,29 +25,37 @@ def get_db():
 # ===============================
 # CREATE EVENT
 # ===============================
+from datetime import datetime
+from fastapi import HTTPException
+
 @router.post("/")
 def create_event(data: EventCreate, db: Session = Depends(get_db)):
+    now = datetime.now()
+
+    if data.start_time < now:
+        raise HTTPException(
+            status_code=400,
+            detail="Không được tạo sự kiện trong quá khứ"
+        )
+
+    if data.end_time <= data.start_time:
+        raise HTTPException(
+            status_code=400,
+            detail="Thời gian kết thúc phải sau thời gian bắt đầu"
+        )
+
     event = Event(
         title=data.title,
         start_time=data.start_time,
         end_time=data.end_time,
         location=data.location
     )
+
     db.add(event)
     db.commit()
     db.refresh(event)
-
-    if data.detail:
-        detail = EventDetail(
-            event_id=event.id,
-            description=data.detail.description,
-            agenda=data.detail.agenda,
-            speaker=data.detail.speaker
-        )
-        db.add(detail)
-        db.commit()
-
     return event
+
 
 # ===============================
 # GET ALL EVENTS
@@ -197,3 +206,36 @@ def admin_events(db: Session = Depends(get_db)):
         })
 
     return result
+@router.put("/{event_id}")
+def update_event(
+    event_id: int,
+    data: EventCreate,
+    db: Session = Depends(get_db)
+):
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    now = datetime.now()
+
+    if data.start_time < now:
+        raise HTTPException(
+            status_code=400,
+            detail="Không thể sửa sự kiện về ngày trong quá khứ"
+        )
+
+    if data.end_time <= data.start_time:
+        raise HTTPException(
+            status_code=400,
+            detail="Thời gian kết thúc phải sau thời gian bắt đầu"
+        )
+
+    event.title = data.title
+    event.start_time = data.start_time
+    event.end_time = data.end_time
+    event.location = data.location
+
+    db.commit()
+    db.refresh(event)
+    return event
+
