@@ -1,4 +1,4 @@
-const API_BASE = "https://event-backend.onrender.com";
+const API_BASE = "https://event-management-1-t87z.onrender.com";
 
 export async function apiGet(url) {
   const res = await fetch(API_BASE + url);
