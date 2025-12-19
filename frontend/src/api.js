@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://event-backend.onrender.com";
 
 export async function apiGet(url) {
   const res = await fetch(API_BASE + url);
