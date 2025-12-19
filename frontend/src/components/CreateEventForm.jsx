@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { apiPost } from "../api";
+import "./CreateEventForm.css";
 
 export default function CreateEventForm({ onClose, onCreated }) {
   const [form, setForm] = useState({
@@ -9,55 +10,71 @@ export default function CreateEventForm({ onClose, onCreated }) {
     location: ""
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   function change(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function submit() {
+    setError("");
+
+    if (!form.title || !form.start_time || !form.end_time) {
+      setError("Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await apiPost("/events", form); // lấy dữ liệu trả về
-      alert("Tạo sự kiện thành công");
-      onCreated(res); // truyền lên parent
+      const res = await apiPost("/events", form);
+      onCreated(res);
       onClose();
     } catch (err) {
-      alert(err.response?.data?.detail || "Lỗi tạo sự kiện");
+      setError(err.response?.data?.detail || "Lỗi tạo sự kiện");
+    } finally {
+      setLoading(false);
     }
   }
 
   const now = new Date().toISOString().slice(0, 16);
 
-  return (
-    <div style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
-      <h3>Tạo sự kiện</h3>
+return (
+  <div className="modal-overlay">
+    <div className="modal">
 
-      <input
-        name="title"
-        placeholder="Tên sự kiện"
-        onChange={change}
-      /><br/>
+      <div className="modal-header">
+        <h3>Tạo sự kiện mới</h3>
+        <button className="close-btn" onClick={onClose}>×</button>
+      </div>
 
-      <input
-        type="datetime-local"
-        name="start_time"
-        min={now}
-        onChange={change}
-      /><br/>
+      <div className="form-group">
+        <label>Tên sự kiện</label>
+        <input name="title" onChange={change} />
+      </div>
 
-      <input
-        type="datetime-local"
-        name="end_time"
-        min={form.start_time}
-        onChange={change}
-      /><br/>
+      <div className="form-group">
+        <label>Thời gian bắt đầu</label>
+        <input type="datetime-local" name="start_time" min={now} onChange={change} />
+      </div>
 
-      <input
-        name="location"
-        placeholder="Địa điểm"
-        onChange={change}
-      /><br/>
+      <div className="form-group">
+        <label>Thời gian kết thúc</label>
+        <input type="datetime-local" name="end_time" min={form.start_time} onChange={change} />
+      </div>
 
-      <button onClick={submit}>Lưu</button>
-      <button onClick={onClose} style={{ marginLeft: 10 }}>Hủy</button>
+      <div className="form-group">
+        <label>Địa điểm</label>
+        <input name="location" onChange={change} />
+      </div>
+
+      <div className="modal-actions">
+        <button className="btn-cancel" onClick={onClose}>Hủy</button>
+        <button className="btn-primary" onClick={submit}>Tạo sự kiện</button>
+      </div>
+
     </div>
-  );
+  </div>
+);
+
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { apiPut } from "../api";
+import "./EditEventForm.css";
 
 export default function EditEventForm({ event, onDone }) {
 
@@ -26,46 +27,66 @@ export default function EditEventForm({ event, onDone }) {
       location: form.location
     });
 
-    alert("Cập nhật thành công");
     onDone();
   }
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
-      <h3>Sửa sự kiện</h3>
+    <div className="edit-overlay">
+      <div className="edit-modal">
 
-      <input
-        name="title"
-        value={form.title || ""}
-        onChange={change}
-        placeholder="Tên sự kiện"
-      /><br/>
+        <div className="edit-header">
+          <h3>Sửa sự kiện</h3>
+          <button className="edit-close" onClick={onDone}>×</button>
+        </div>
 
-      <input
-        type="datetime-local"
-        name="start_time"
-        value={form.start_time}
-        onChange={change}
-      /><br/>
+        <div className="edit-group">
+          <label>Tên sự kiện</label>
+          <input
+            name="title"
+            value={form.title || ""}
+            onChange={change}
+          />
+        </div>
 
-      <input
-        type="datetime-local"
-        name="end_time"
-        value={form.end_time}
-        onChange={change}
-      /><br/>
+        <div className="edit-group">
+          <label>Thời gian bắt đầu</label>
+          <input
+            type="datetime-local"
+            name="start_time"
+            value={form.start_time}
+            onChange={change}
+          />
+        </div>
 
-      <input
-        name="location"
-        value={form.location || ""}
-        onChange={change}
-        placeholder="Địa điểm"
-      /><br/>
+        <div className="edit-group">
+          <label>Thời gian kết thúc</label>
+          <input
+            type="datetime-local"
+            name="end_time"
+            value={form.end_time}
+            onChange={change}
+          />
+        </div>
 
-      <button onClick={submit}>Lưu</button>
-      <button onClick={onDone} style={{ marginLeft: 5 }}>
-        Hủy
-      </button>
+        <div className="edit-group">
+          <label>Địa điểm</label>
+          <input
+            name="location"
+            value={form.location || ""}
+            onChange={change}
+          />
+        </div>
+
+        <div className="edit-actions">
+          <button className="btn-save" onClick={submit}>
+            Lưu
+          </button>
+          <button className="btn-cancel" onClick={onDone}>
+            Hủy
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }

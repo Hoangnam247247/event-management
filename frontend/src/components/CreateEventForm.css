@@ -1,0 +1,110 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  width: 100%;
+  max-width: 420px;        /* 👈 NHỎ LẠI */
+  border-radius: 12px;
+  padding: 20px 22px;     /* 👈 GIẢM PADDING */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  position: relative;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;   
+}
+
+.modal-header h3 {
+  font-size: 18px;     
+  font-weight: 600;
+  color: #2563eb;
+}
+.modal-header {
+  justify-content: center;  
+  position: relative;
+}
+
+.modal-header h3 {
+  text-align: center;     
+  width: 100%;
+}
+.close-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 28px;         
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+   position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.form-group input {
+  width: 92%;              /* 👈 KHÔNG full */
+  margin: 0 auto;          /* 👈 CĂN GIỮA */
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #c7d2fe;
+  font-size: 13px;
+  display: block;          /* 👈 BẮT BUỘC */
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.btn-cancel {
+  padding: 6px 14px;      /* 👈 NÚT GỌN */
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-primary {
+  padding: 6px 16px;
+  border-radius: 8px;
+  background: #2563eb;    /* 👈 BỎ GRADIENT */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}

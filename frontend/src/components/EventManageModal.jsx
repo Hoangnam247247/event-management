@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { apiGet, apiDelete } from "../api";
 import CreateEventForm from "./CreateEventForm";
 import EditEventForm from "./EditEventForm";
+import "./EventManageModal.css";
+
 
 export default function EventManageModal({ onClose }) {
   const [events, setEvents] = useState([]);
@@ -34,31 +36,50 @@ export default function EventManageModal({ onClose }) {
     apiGet("/events/admin/events").then(setEvents);
   }
 
-  return (
-    <div style={overlay}>
-      <div style={modal}>
+return (
+  <div className="manage-overlay">
+    <div className="manage-modal">
+
+      {/* HEADER */}
+      <div className="manage-header">
         <h2>Quản lý sự kiện</h2>
 
-        <div style={{ marginBottom: 10 }}>
-          <button onClick={() => setShowCreate(true)}>+ Tạo sự kiện mới</button>
-          <button onClick={onClose} style={{ marginLeft: 10 }}>Đóng</button>
+        <div className="manage-actions">
+          <button
+            className="btn-primary"
+            onClick={() => setShowCreate(true)}
+          >
+            + Tạo sự kiện
+          </button>
+
+          <button
+            className="btn-outline"
+            onClick={onClose}
+          >
+            Đóng
+          </button>
         </div>
+      </div>
 
-        {showCreate && (
-          <CreateEventForm
-            onCreated={handleCreated}
-            onClose={() => setShowCreate(false)}
-          />
-        )}
+      {/* FORM CREATE */}
+      {showCreate && (
+        <CreateEventForm
+          onCreated={handleCreated}
+          onClose={() => setShowCreate(false)}
+        />
+      )}
 
-        {editing && (
-          <EditEventForm
-            event={editing}
-            onDone={handleEdited}
-          />
-        )}
+      {/* FORM EDIT */}
+      {editing && (
+        <EditEventForm
+          event={editing}
+          onDone={handleEdited}
+        />
+      )}
 
-        <table border="1" cellPadding="8" width="100%">
+      {/* TABLE */}
+      <div className="table-wrap">
+        <table className="manage-table">
           <thead>
             <tr>
               <th>Tên</th>
@@ -70,23 +91,36 @@ export default function EventManageModal({ onClose }) {
           <tbody>
             {events.map(e => (
               <tr
-                key={e.id} // ID duy nhất từ server
+                key={e.id}
                 title={`Tổng vé: ${e.total_tickets || 0}\nCheck-in: ${e.checked_in || 0}`}
               >
                 <td>{e.title}</td>
                 <td>{new Date(e.start_time).toLocaleString()}</td>
                 <td>{e.location}</td>
                 <td>
-                  <button onClick={() => setEditing(e)}>Sửa</button>
-                  <button onClick={() => remove(e.id)} style={{ marginLeft: 5 }}>Xoá</button>
+                  <button
+                    className="action-btn btn-edit"
+                    onClick={() => setEditing(e)}
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    className="action-btn btn-delete"
+                    onClick={() => remove(e.id)}
+                  >
+                    Xoá
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
     </div>
-  );
+  </div>
+);
+
 }
 
 /* ===== style ===== */

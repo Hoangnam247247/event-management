@@ -34,12 +34,14 @@ export default function RegisterModal({ eventId, onClose }) {
   return (
     <div style={overlay}>
       <div style={modal}>
-        <h3>Đăng ký tham gia</h3>
+        {/* HEADER */}
+        <h3 style={title}>Đăng ký tham gia</h3>
 
+        {/* STEP 1 */}
         {step === 1 && (
           <>
             <input
-              placeholder="Họ tên"
+              placeholder="Họ và tên"
               value={name}
               onChange={e => setName(e.target.value)}
               style={input}
@@ -50,26 +52,50 @@ export default function RegisterModal({ eventId, onClose }) {
               onChange={e => setEmail(e.target.value)}
               style={input}
             />
-            <button disabled={!name || !email} onClick={() => setStep(2)}>
-              Tiếp tục
-            </button>
+
+            <div style={actions}>
+              <button
+                disabled={!name || !email}
+                onClick={() => setStep(2)}
+                style={{
+                  ...primaryBtn,
+                  opacity: !name || !email ? 0.6 : 1
+                }}
+              >
+                Tiếp tục
+              </button>
+            </div>
           </>
         )}
 
+        {/* STEP 2 */}
         {step === 2 && (
           <>
-            <p>Chọn ghế:</p>
+            <p style={{ marginBottom: 10, fontWeight: 600 }}>
+              Chọn ghế
+            </p>
+
             <SeatMap
               bookedSeats={bookedSeats}
               selectedSeat={seat}
               onSelect={setSeat}
             />
-            <div style={{ marginTop: 20 }}>
-              <button onClick={() => setStep(1)}>Quay lại</button>
+
+            <div style={actions}>
+              <button
+                onClick={() => setStep(1)}
+                style={secondaryBtn}
+              >
+                Quay lại
+              </button>
+
               <button
                 disabled={!seat || loading}
                 onClick={submit}
-                style={{ marginLeft: 10 }}
+                style={{
+                  ...primaryBtn,
+                  opacity: !seat || loading ? 0.6 : 1
+                }}
               >
                 {loading ? "Đang gửi..." : "Đăng ký"}
               </button>
@@ -77,7 +103,8 @@ export default function RegisterModal({ eventId, onClose }) {
           </>
         )}
 
-        <button onClick={onClose} style={{ marginTop: 10 }}>
+        {/* CLOSE */}
+        <button onClick={onClose} style={closeBtn}>
           Đóng
         </button>
       </div>
@@ -85,20 +112,80 @@ export default function RegisterModal({ eventId, onClose }) {
   );
 }
 
+/* ================== STYLES ================== */
+
 const overlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,.4)",
+  background: "rgba(0,0,0,0.45)",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
+  zIndex: 999
 };
 
 const modal = {
   background: "#fff",
-  padding: 20,
-  borderRadius: 8,
-  width: 420
+  padding: 24,
+  borderRadius: 12,
+  width: 420,
+  maxWidth: "90%",
+  boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+  fontFamily: "system-ui, -apple-system, BlinkMacSystemFont"
 };
 
-const input = { width: "100%", padding: 8, marginBottom: 10 };
+const title = {
+  marginBottom: 16,
+  fontSize: 20,
+  fontWeight: 700,
+  color: "#1e40af",
+  textAlign: "center"
+};
+
+const input = {
+  width: "100%",
+  padding: "10px 14px",
+  marginBottom: 12,
+  borderRadius: 8,
+  border: "1px solid #1e40af",
+  outline: "none",
+  fontSize: 14
+};
+
+const actions = {
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: 10,
+  marginTop: 16
+};
+
+const primaryBtn = {
+  padding: "10px 18px",
+  borderRadius: 8,
+  border: "none",
+  background: "#1e40af",
+  color: "#fff",
+  fontWeight: 600,
+  cursor: "pointer"
+};
+
+const secondaryBtn = {
+  padding: "10px 18px",
+  borderRadius: 8,
+  border: "1px solid #1e40af",
+  background: "#fff",
+  color: "#1e40af",
+  fontWeight: 600,
+  cursor: "pointer"
+};
+
+const closeBtn = {
+  marginTop: 18,
+  width: "100%",
+  padding: "10px",
+  borderRadius: 8,
+  border: "none",
+  background: "#e5e7eb",
+  cursor: "pointer",
+  fontWeight: 500
+};

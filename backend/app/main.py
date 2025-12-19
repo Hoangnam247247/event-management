@@ -46,7 +46,7 @@ async def start_reminder_background():
         await asyncio.sleep(60)  # đợi 1 phút rồi mới chạy
         while True:
             send_reminders_job()
-            await asyncio.sleep(60)  # 1 phút/lần
+            await asyncio.sleep(1800)  # 1 phút/lần
 
     asyncio.create_task(reminder_loop())
 
