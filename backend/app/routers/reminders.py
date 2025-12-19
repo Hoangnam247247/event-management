@@ -1,3 +1,4 @@
+# app/routers/reminders.py
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -19,27 +20,34 @@ def get_db():
 @router.post("/send")
 def send_event_reminders(db: Session = Depends(get_db)):
     now = datetime.now()
-    events = db.query(Event).filter(
-        Event.start_time > now,
-        Event.start_time <= now + timedelta(hours=24)
-    ).all()
+    next_24h = now + timedelta(hours=24)
 
-    sent = 0
+    registrations = db.query(Registration).filter(
+    Registration.event_id == event.id,
+    Registration.reminder_sent == False   # ✅
+).all()
+
+
+    sent_count = 0
+
     for event in events:
         registrations = db.query(Registration).filter(
             Registration.event_id == event.id,
-            Registration.reminder_sent == False
+            Registration.is_reminded == False
         ).all()
 
         for reg in registrations:
             send_reminder_email(
                 to_email=reg.email,
                 event_title=event.title,
-                start_time=event.start_time.strftime("%d/%m/%Y %H:%M")
+                start_time=event.start_time
             )
             reg.reminder_sent = True
-            sent += 1
+            sent_count += 1
 
     db.commit()
-    return {"message": "Reminder emails sent", "emails_sent": sent}
 
+    return {
+        "message": "Reminders sent successfully",
+        "total_sent": sent_count
+    }

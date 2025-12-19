@@ -11,6 +11,7 @@ class Registration(Base):
     seat_number = Column(String)
     status = Column(String, default="registered")
     event_id = Column(Integer, ForeignKey("events.id"))
+    reminder_sent = Column(Boolean, default=False)
 
     event = relationship("Event", back_populates="registrations")
     ticket = relationship("Ticket", back_populates="registration", uselist=False)
